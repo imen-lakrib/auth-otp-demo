@@ -16,6 +16,7 @@ import { auth } from "./firebase";
 function Test() {
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+
   const [ph, setPh] = useState("");
   const [showOTP, setShowOTP] = useState(false);
   const [user, setUser] = useState(null);
@@ -32,7 +33,7 @@ function Test() {
             console.log("Recaptcha callback response:", response);
             onSignup();
           },
-          "expired-callback": () => {},
+          "expired-callback": () => { },
         },
         auth // Use the initialized Firebase app here
       );
@@ -40,9 +41,9 @@ function Test() {
   }
 
   function onSignup() {
-    console.log("Entering onSignup");
     setLoading(true);
     onCaptchVerify();
+
 
     const appVerifier = window.recaptchaVerifier;
 
@@ -56,13 +57,12 @@ function Test() {
         console.log(formatPh)
 
         toast.success("OTP sent successfully!");
-        console.log("OTP sent successfully!");
+
       })
       .catch((error) => {
-        console.log(formatPh)
-        console.log("appVerifierappVerifierappVerifierappVerifierappVerifier",appVerifier)
-
         console.error("Error sending OTP:", error);
+
+        toast.error("An error occurred. Please try again.");
         setLoading(false);
       });
 
@@ -71,6 +71,7 @@ function Test() {
   function onOTPVerify() {
     console.log("Entering onOTPVerify");
     setLoading(true);
+
     window.confirmationResult
       .confirm(otp)
       .then(async (res) => {
@@ -80,46 +81,21 @@ function Test() {
       })
       .catch((err) => {
         console.error("Error verifying OTP:", err);
+        toast.error("An error occurred. Please try again.");
+
         setLoading(false);
+
       });
   }
 
-  function onResendOTP() {
-    setLoading(true);
-    // clearRecaptchaVerifier(); // Clear the existing recaptchaVerifier
-  
-    onCaptchVerify(); // Reinitialize the reCAPTCHA verifier
-  
-    const appVerifier = window.recaptchaVerifier;
-  
-    const formatPh = "+" + ph;
-  
-    signInWithPhoneNumber(auth, formatPh, appVerifier)
-      .then((confirmationResult) => {
-        window.confirmationResult = confirmationResult;
-        setLoading(false);
-        setShowOTP(true); // Show the OTP inputs after resending OTP
-        toast.success("OTP sent successfully!");
-        console.log("OTP sent successfully!");
-      })
-      .catch((error) => {
-        console.error("Error sending OTP:", error);
-        setLoading(false);
-  
-        // Reset the reCAPTCHA to allow the user to try again
-        if (window.recaptchaVerifier && window.recaptchaVerifier.reset) {
-          window.recaptchaVerifier.reset(); // Reset the reCAPTCHA widget
-        }
-      });
-  }
+
 
 
   return (
-    <>
-      <div></div>
+    <div style={{position:"relative"}}>
       <h1>Otp Demo</h1>
       <Toaster toastOptions={{ duration: 4000 }} />
-        <div id="recaptcha-container"></div>
+      <div id="recaptcha-container"></div>
       {user ? (
         <h2 className="text-center text-white font-medium text-2xl">
           👍Login Success
@@ -172,19 +148,13 @@ function Test() {
                 onClick={onOTPVerify}
                 disabled={loading ? true : false}>
                 {loading && (
+
                   <CgSpinner size={20} className="mt-1 animate-spin" />
                 )}{" "}
                 Verify OTP
               </button>
 
-              <button
-                onClick={onResendOTP}
-                disabled={loading ? true : false}>
-                {loading && (
-                  <CgSpinner size={20} className="mt-1 animate-spin" />
-                )}{" "}
-                Send OTP Again
-              </button>
+
             </div>
           ) : (
             <div style={{ textAlign: "center" }}>
@@ -227,7 +197,14 @@ function Test() {
         </div>
       )}
 
-    </>
+
+      {loading && <div style={{
+        height: "100%", width: "100%", backgroundColor: "#679B9B", position: "absolute", top:0, display:"flex", alignItems:"center", justifyContent:"center", opacity:.5, cursor:"default"
+      }}>
+        <h3>Please wait ...</h3>
+      </div>}
+
+    </div>
   );
 }
 
