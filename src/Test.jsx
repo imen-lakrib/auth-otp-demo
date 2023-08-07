@@ -86,7 +86,7 @@ function Test() {
 
   function onResendOTP() {
     setLoading(true);
-    clearRecaptchaVerifier(); // Clear the existing recaptchaVerifier
+    // clearRecaptchaVerifier(); // Clear the existing recaptchaVerifier
   
     onCaptchVerify(); // Reinitialize the reCAPTCHA verifier
   
